@@ -1,5 +1,9 @@
 # GitLab CI Course - FreeCodeCamp  
 
+## Links
+
+1. [DevOps with GitLab CI Course - Build Pipelines and Deploy to AWS - YouTube](https://www.youtube.com/watch?v=PGyhBwLyK2U)
+
 ## Progress  
 
 - [x] ⌨️ Lesson 1 - Welcome (0:00:00​)
