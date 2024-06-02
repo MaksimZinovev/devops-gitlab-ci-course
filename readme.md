@@ -2,18 +2,21 @@
 
 ## Links
 
-1. [DevOps with GitLab CI Course - Build Pipelines and Deploy to AWS - YouTube](https://www.youtube.com/watch?v=PGyhBwLyK2U)
+1. [Classentral](https://www.classcentral.com/classroom/freecodecamp-devops-with-gitlab-ci-course-build-pipelines-and-deploy-to-aws-104862)
+2. [DevOps with GitLab CI Course - Build Pipelines and Deploy to AWS - YouTube](https://www.youtube.com/watch?v=PGyhBwLyK2U)
+3. [Learn GitLab with tutorials  GitLab](https://docs.gitlab.com/ee/tutorials/)
+4. [Run Playwright Tests via GitLab](https://medium.com/@info_70421/running-playwright-tests-via-gitlab-ci-cd-pipeline-572e1d95f6f2)
 
 ## Progress  
 
 - [x] ⌨️ Lesson 1 - Welcome (0:00:00​)
 - [x] ⌨️ Lesson 2 - Your first GitLab project (0:03:03​)
 - [x] ⌨️ Lesson 3 - Your first pipeline (0:13:00​)
-- [ ] ⌨️ Lesson 4 - Help, my pipeline is not working (0:23:32)
-- [ ] ⌨️ Lesson 5 - What is YAML? (0:26:22)
-- [ ] ⌨️ Lesson 6 - What is a shell? (0:35:12)
-- [ ] ⌨️ Lesson 7 - GitLab architecture (0:37:50)
-- [ ] ⌨️ Lesson 8 - Pipeline stages (0:43:14)
+- [x] ⌨️ Lesson 4 - Help, my pipeline is not working (0:23:32)
+- [x] ⌨️ Lesson 5 - What is YAML? (0:26:22)
+- [x] ⌨️ Lesson 6 - What is a shell? (0:35:12)
+- [x] ⌨️ Lesson 7 - GitLab architecture (0:37:50)
+- [x] ⌨️ Lesson 8 - Pipeline stages (0:43:14)
 
 ## Lesson 2 - Your first GitLab project (0:03:03​)
 
@@ -105,4 +108,123 @@ Keyboard
 Cleaning up project directory and file based variables
 00:01
 Job succeeded
+```
+
+## Lesson 4 - Help, my pipeline is not working
+
+1. Missing colon after job in yml file
+2. Missing space between dash and command
+3. Incorrect levele indentation (dfault 4 spaces )
+
+## Lesson 5 - What is YAML
+
+yaml example
+
+```yml
+person:
+    name: John
+    age: 23
+
+    hobbies:
+        - sports
+        - YouTube
+        - hiking
+    address: 
+        street: 123 Mayfield Ave.
+    experience:
+        - title: Junior Dev
+          period: 2000-2005
+        - title: Senior Dev 
+          period: since 2005
+```
+
+It is important to use defined keywords and definitions.
+
+## Lesson 7 - GitLab architecture
+
+![GitLab-architecture](attachments/L07/GitLab-architecture.pngGitLab-architecture.png)
+
+GitLab runner has relatively simple installation.
+Can be run even on laptop.
+
+- GitLab project > Settings > Runners  
+
+Shared runners are shared between all GitLab users. F
+
+## Lesson 8 - Pipeline stages  
+
+```yaml
+variables:
+  ENV: 'dev'
+
+stages:
+  - setup
+  - test
+
+setup data: 
+  stage: setup
+  script:
+    - echo "Run script from setup"
+
+run_playwright_smoke_tests:
+  stage: test
+  image: mcr.microsoft.com/playwright:v1.41.1-jammy
+  script:
+    - echo "Run script with $ENV environment from test stage"
+
+```
+
+## Lesson 9 - Why do pipelines fail?
+
+Pipeline failed:
+Exit code - 1  
+
+Try to check the last command executing before fail occured. 
+What is the Docker image used?
+
+##  Lesson 10 - Job artifacts
+
+Job artifacts allow sharing outputs between different jobs in pipeline. For example files. 
+
+```yaml
+variables:
+  ENV: 'dev'
+
+stages:
+  - setup
+  - test
+
+setup data: 
+  stage: setup
+  script:
+    - echo "Run script from setup"
+
+run_playwright_smoke_tests:
+  stage: test
+  image: mcr.microsoft.com/playwright:v1.41.1-jammy
+  script:
+    - echo "Run script with $ENV environment from test stage"
+  artifacts:
+      paths: 
+          - build 
+
+```
+
+## Setting env variables in CI pipeline and using in Playwright tests  
+
+```yaml
+variables:
+  ENV: 'basewcdev'
+  CI: 'true'
+
+```
+
+playwright.config.ts
+
+```json
+  {
+    video: retain-on-failure,
+    headless: process.env.CI === 'true' ? true : false,
+  }
+
 ```
