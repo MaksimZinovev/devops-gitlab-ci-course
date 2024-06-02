@@ -60,11 +60,11 @@ build laptop:
     script: 
         - echo "Building laptop"
         - mkdir build
-        - touch build/computer.txt
-        - echo "Mainboard" >> build/computer.txt
-        - cat build/computer.txt
-        - echo "Keyboard" >> build/computer.txt
-        - cat build/computer.txt
+        - touch build/$BUILD_FILE_NAME
+        - echo "Mainboard" >> build/$BUILD_FILE_NAME
+        - cat build/$BUILD_FILE_NAME
+        - echo "Keyboard" >> build/$BUILD_FILE_NAME
+        - cat build/$BUILD_FILE_NAME
 ```  
 
 Output
@@ -97,12 +97,12 @@ Using docker image sha256:f8c20f8bbcb684055b4fea470fdd169c86e87786940b3262335b12
 $ echo "Building laptop"
 Building laptop
 $ mkdir build
-$ touch build/computer.txt
-$ echo "Mainboard" >> build/computer.txt
-$ cat build/computer.txt
+$ touch build/$BUILD_FILE_NAME
+$ echo "Mainboard" >> build/$BUILD_FILE_NAME
+$ cat build/$BUILD_FILE_NAME
 Mainboard
-$ echo "Keyboard" >> build/computer.txt
-$ cat build/computer.txt
+$ echo "Keyboard" >> build/$BUILD_FILE_NAME
+$ cat build/$BUILD_FILE_NAME
 Mainboard
 Keyboard
 Cleaning up project directory and file based variables
@@ -186,29 +186,92 @@ What is the Docker image used?
 
 Job artifacts allow sharing outputs between different jobs in pipeline. For example files. 
 
+Use `artifacts` and `paths` to create artifact so that it can be used in other pipeline jobs.
+
+
 ```yaml
-variables:
-  ENV: 'dev'
+build laptop:
+    ...
+    artifacts:
+        paths:
+            - build
 
-stages:
-  - setup
-  - test
 
-setup data: 
-  stage: setup
-  script:
-    - echo "Run script from setup"
-
-run_playwright_smoke_tests:
-  stage: test
-  image: mcr.microsoft.com/playwright:v1.41.1-jammy
-  script:
-    - echo "Run script with $ENV environment from test stage"
-  artifacts:
-      paths: 
-          - build 
 
 ```
+
+
+```yaml
+stages:
+    - build
+    - test
+
+build laptop:
+    image: alpine
+    stage: build
+    script: 
+        - echo "Building a laptop"
+        - mkdir build
+        - touch build/$BUILD_FILE_NAME
+        - echo "Mainboard" >> build/$BUILD_FILE_NAME
+        - cat build/$BUILD_FILE_NAME
+        - echo "Keyboard" >> build/$BUILD_FILE_NAME
+    artifacts:
+        paths:
+            - build
+
+test laptop:
+    image: alpine
+    stage: test
+    script:
+        - test -f build/$BUILD_FILE_NAME
+```
+
+
+## Lesson 11 - Testing the build
+
+Use `grep` to test contents of the file contain expected word so that this can be used to verify that code change does not break functionality.
+
+
+```yaml
+
+   - grep "Display" build/$BUILD_FILE_NAME
+
+````
+
+##  Lesson 12 - Variables
+
+Use `variables` as a global variable to specify file name so that file name can be changed in one place only  and take effect in multiple parts of pipeline.
+
+
+```yaml
+stages:
+    - build
+    - test
+variables:
+  BUILD_FILE_NAME: laptop.txt
+
+build laptop:
+    image: alpine
+    stage: build
+    script: 
+        - echo "Building a laptop"
+        - mkdir build
+        - touch build/$BUILD_FILE_NAME
+        - echo "Mainboard" >> build/$BUILD_FILE_NAME
+        - cat build/$BUILD_FILE_NAME
+        - echo "Keyboard" >> build/$BUILD_FILE_NAME
+    artifacts:
+        paths:
+            - build
+
+test laptop:
+    image: alpine
+    stage: test
+    script:
+        - test -f build/$BUILD_FILE_NAME
+```
+
 
 ## Setting env variables in CI pipeline and using in Playwright tests  
 
